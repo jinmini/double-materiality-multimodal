@@ -1,0 +1,32 @@
+# ESG 이슈 풀 추출기 환경 설정 예시
+# 이 파일을 .env로 복사하고 실제 값을 입력하세요
+
+# 애플리케이션 설정
+DEBUG=true
+APP_NAME=ESG 이슈 풀 추출기
+APP_VERSION=1.0.0
+
+# API 제한 설정 (CTO 조언 반영)
+DAILY_API_LIMIT=20
+MAX_REQUESTS_PER_MINUTE=5
+
+# 파일 처리 설정
+MAX_FILE_SIZE=52428800  # 50MB
+UPLOAD_DIR=temp_uploads
+OUTPUT_DIR=processed_docs
+
+# Google Gemini API 설정
+# https://ai.google.dev/gemini-api/docs/quickstart?lang=python&hl=ko 에서 API 키 발급
+GEMINI_API_KEY=your-gemini-api-key-here
+GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MAX_TOKENS=2000
+
+# 로깅 설정
+LOG_LEVEL=INFO
+LOG_FILE=app.log
+
+# 사용 방법:
+# 1. Google AI Studio (https://aistudio.google.com/app/apikey)에서 API 키 발급
+# 2. GEMINI_API_KEY에 발급받은 키 입력
+# 3. pip install -r requirements.txt
+# 4. python run_server.py 
