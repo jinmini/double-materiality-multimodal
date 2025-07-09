@@ -4,15 +4,17 @@ uvicorn==0.24.0
 python-multipart==0.0.6
 python-dotenv==1.0.0
 
-# 문서 처리 라이브러리
-unstructured[pdf]==0.11.2
+# 비정형 데이터 처리
+unstructured[pdf]
 pypdf2==3.0.1
-pillow==10.1.0
+PyMuPDF==1.23.26  # PDF → 이미지 변환용
+Pillow
+google-cloud-vision==3.7.2
 
-# 데이터 처리
-pydantic==2.5.0
-pydantic-settings==2.1.0
-typing-extensions==4.8.0
+# 설정 및 데이터 검증
+pydantic
+pydantic-settings
+typing-extensions
 
 # 로깅 및 유틸리티
 coloredlogs==15.0.1

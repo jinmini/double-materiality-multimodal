@@ -1,11 +1,142 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
+# Virtual Environments
 .unstructured_env/
 unstructured_env/
 .venv/
 venv/
+env/
+ENV/
+
+# Environment Variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+app.log
+logs/
+
+# Temporary files and uploads
+temp_uploads/
+tmp/
+*.tmp
+*.temp
+
+# Processed documents (선택적 - 결과물 보관 시 주석 처리)
+# processed_docs/
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# FastAPI
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# API Keys and Secrets
+*.key
+secrets/
+credentials/
+
+# Docker
+.dockerignore
+
+# Database
+*.db
+*.sqlite3
+
+# Media files (large PDFs for testing)
+*.pdf
+!komipo_issue.pdf  # 테스트용 파일은 유지
+
+# Figures and images (용량이 큰 이미지들)
+figures/
+images/
+screenshots/
+
+# Documentation build
+docs/_build/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 

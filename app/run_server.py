@@ -22,7 +22,7 @@ def main():
     
     try:
         uvicorn.run(
-            "main:app",
+            "app.main:app",  # ✅ 변경: main:app → app.main:app
             host="0.0.0.0",
             port=8000,
             reload=True,

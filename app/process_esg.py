@@ -32,14 +32,18 @@ class ESGDocumentProcessor:
         start_time = time.time()
         
         try:
-            # Unstructured로 PDF 파티셔닝
+            # Unstructured로 PDF 파티셔닝 (개선된 설정)
+            print(f"🔧 처리 전략: {'OCR 포함 고해상도' if use_ocr else '고해상도'}")
+            
             elements = partition_pdf(
                 filename=pdf_path,
-                strategy="fast",  # "fast", "hi_res", "ocr_only" 옵션
+                strategy="hi_res" if not use_ocr else "ocr_only",  # 고해상도 또는 OCR
                 infer_table_structure=True,  # 테이블 구조 인식
                 include_page_breaks=True,    # 페이지 구분 포함
-                extract_images_in_pdf=False, # 이미지 추출 (용량 절약을 위해 False)
-                chunking_strategy="by_title" # 제목별 청킹
+                extract_images_in_pdf=True,  # 이미지도 추출
+                chunking_strategy="by_title", # 제목별 청킹
+                languages=["kor", "eng"],     # 한국어/영어 지원
+                ocr_languages=["kor", "eng"] if use_ocr else None  # OCR 언어 설정
             )
             
             print(f"✅ 총 {len(elements)}개 요소 추출 완료")
@@ -81,11 +85,24 @@ class ESGDocumentProcessor:
         return structure
     
     def extract_esg_keywords(self, elements: List) -> Dict[str, List[str]]:
-        """ESG 관련 키워드 및 내용 추출"""
+        """ESG 관련 키워드 및 내용 추출 (중대성 이슈 중심)"""
         esg_keywords = {
-            "환경(E)": ["온실가스", "탄소배출", "에너지", "재생에너지", "환경경영", "기후변화", "탄소중립"],
-            "사회(S)": ["안전", "직원", "다양성", "지역사회", "인권", "고용", "복지", "교육"],
-            "지배구조(G)": ["이사회", "윤리", "컴플라이언스", "투명성", "감사", "위험관리", "지배구조"]
+            "환경(E)": [
+                "기후변화", "탄소중립", "온실가스", "탄소배출", "에너지", "재생에너지", 
+                "환경경영", "환경보전", "자원순환", "폐기물", "물관리", "생물다양성"
+            ],
+            "사회(S)": [
+                "안전보건", "산업안전", "직원", "인권", "다양성", "포용성", "지역사회", 
+                "상생협력", "고용", "복지", "교육", "노사관계", "공급망", "고객만족"
+            ],
+            "지배구조(G)": [
+                "이사회", "지배구조", "윤리", "컴플라이언스", "투명성", "감사", "위험관리", 
+                "정보보호", "반부패", "내부통제", "경영진", "이해관계자"
+            ],
+            "중대성평가": [
+                "중대성", "이슈", "중요도", "이해관계자", "매트릭스", "우선순위", 
+                "영향도", "발생가능성", "Double Materiality"
+            ]
         }
         
         extracted_content = {category: [] for category in esg_keywords.keys()}
