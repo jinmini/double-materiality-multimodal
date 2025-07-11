@@ -35,8 +35,16 @@ def detect_industry_from_text(text: str) -> str:
             # 키워드 빈도에 따른 점수 계산
             count = text.count(keyword)
             if count > 0:
-                # 로그 스케일로 점수 계산 (빈도가 높을수록 점수 증가하지만 급격하지 않게)
-                score += min(count * 2, 10)  # 최대 10점
+                # 🔥 개선: 키워드별 가중치 적용
+                if "발전" in keyword or "회사" in keyword or "한국" in keyword:
+                    # 회사명이나 핵심 업종 키워드에 높은 가중치
+                    score += min(count * 5, 25)  # 최대 25점
+                elif len(keyword) >= 4:
+                    # 구체적인 키워드 (4글자 이상)에 중간 가중치
+                    score += min(count * 3, 15)  # 최대 15점
+                else:
+                    # 일반 키워드에 기본 가중치
+                    score += min(count * 2, 10)  # 최대 10점
         
         industry_scores[industry] = score
     
@@ -44,6 +52,11 @@ def detect_industry_from_text(text: str) -> str:
     if industry_scores and max(industry_scores.values()) > 0:
         detected_industry = max(industry_scores, key=industry_scores.get)
         print(f"🏭 감지된 업종: {detected_industry} (점수: {industry_scores[detected_industry]})")
+        
+        # 🔥 개선: 디버깅을 위한 상위 3개 업종 점수 출력
+        sorted_industries = sorted(industry_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+        print(f"🏭 업종별 점수: {sorted_industries}")
+        
         return detected_industry
     
     return "기타"
@@ -111,8 +124,23 @@ def extract_materiality_issues_enhanced(elements: List[Any]) -> Dict[str, Any]:
     for element in elements:
         element_text = getattr(element, 'text', str(element))
         
-        # 중대성 관련 키워드가 포함된 요소만 필터링
-        if not any(keyword in element_text for keyword in MATERIALITY_KEYWORDS):
+        # 🔥 개선: 필터링 조건 완화 - ESG 관련 키워드만 있어도 처리
+        esg_related = False
+        
+        # 중대성 키워드 체크
+        if any(keyword in element_text for keyword in MATERIALITY_KEYWORDS):
+            esg_related = True
+        
+        # ESG 기본 키워드 체크 (환경, 사회, 지배구조)
+        basic_esg_keywords = ["환경", "사회", "지배구조", "ESG", "지속가능", "sustainability"]
+        if any(keyword in element_text for keyword in basic_esg_keywords):
+            esg_related = True
+        
+        # 텍스트가 충분히 길고 의미가 있는 경우 (20자 이상)
+        if len(element_text.strip()) >= 20:
+            esg_related = True
+        
+        if not esg_related:
             continue
 
         # 각 ESG 이슈별로 매칭 검사

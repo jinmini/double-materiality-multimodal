@@ -262,7 +262,8 @@ class DocumentProcessingService:
                 infer_table_structure=False,  # 테이블 처리 비활성화
                 include_page_breaks=False,    # 페이지 구분 비활성화
                 extract_images_in_pdf=False,  # 이미지 추출 비활성화
-                languages=["kor"]  # 한국어만
+                languages=["eng"]  # 영어 (한국어 OCR 문제 해결을 위해 변경)
+                # languages=["kor"]  # 한국어만 (주석처리)
             )
             
             logger.info(f"🔵 FAST 전략: {len(elements)}개 요소 추출")
@@ -283,7 +284,8 @@ class DocumentProcessingService:
                 infer_table_structure=False,  # 테이블 처리 비활성화
                 include_page_breaks=False,    # 페이지 구분 비활성화
                 extract_images_in_pdf=False,  # 이미지 추출 비활성화
-                languages=["kor"],  # 한국어만
+                languages=["eng"],  # 영어 (한국어 OCR 문제 해결을 위해 변경)
+                # languages=["kor"],  # 한국어만 (주석처리)
                 max_pages=5  # 최대 5페이지만 처리
             )
             
