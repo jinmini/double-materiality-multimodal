@@ -221,7 +221,7 @@ class DocumentProcessingService:
     
     async def process_document_with_vision(self, file_path: str) -> Dict[str, Any]:
         """
-        Gemini Vision API 기반 문서 처리
+        Gemini Vision API 기반 문서 처리 (타임아웃 적용)
         """
         logger.info(f"🔍 Gemini Vision 문서 처리 시작: {file_path}")
         
@@ -229,6 +229,7 @@ class DocumentProcessingService:
             # Gemini Vision 처리기 초기화
             from app.services.gemini_vision_processor import GeminiVisionDocumentProcessor
             from app.infrastructure.clients.pdf_converter import PDFConverter
+            import asyncio
             
             pdf_converter = PDFConverter(dpi=200)
             vision_processor = GeminiVisionDocumentProcessor(
@@ -236,14 +237,24 @@ class DocumentProcessingService:
                 pdf_converter=pdf_converter
             )
             
-            # Vision API로 처리
-            result = await vision_processor.process_document(file_path)
+            # 전체 처리에 180초 (3분) 타임아웃 적용
+            logger.info("🔍 Vision API 처리 시작 (최대 3분 타임아웃)")
+            result = await asyncio.wait_for(
+                vision_processor.process_document(file_path),
+                timeout=180.0
+            )
             
             # 비용 기록
             self.cost_manager.record_api_call("gemini_vision", 1, 1000, 0.01)  # 임시 비용
             
             return result
             
+        except asyncio.TimeoutError:
+            logger.error("❌ Gemini Vision 전체 처리 타임아웃 (3분 초과)")
+            raise HTTPException(
+                status_code=408,
+                detail="문서 처리 시간이 3분을 초과했습니다. 더 작은 파일을 사용하거나 일반 업로드를 시도해주세요."
+            )
         except Exception as e:
             logger.error(f"❌ Gemini Vision 처리 오류: {str(e)}")
             raise HTTPException(
@@ -258,9 +269,9 @@ class DocumentProcessingService:
             
             elements = partition_pdf(
                 filename=file_path,
-                strategy="fast",  # 가장 빠른 전략
-                infer_table_structure=False,  # 테이블 처리 비활성화
-                include_page_breaks=False,    # 페이지 구분 비활성화
+                strategy="hi_res",  # 고해상도 전략으로 변경
+                infer_table_structure=True,  # 테이블 구조 인식 활성화
+                include_page_breaks=True,    # 페이지 구분 활성화
                 extract_images_in_pdf=False,  # 이미지 추출 비활성화
                 languages=["eng"]  # 영어 (한국어 OCR 문제 해결을 위해 변경)
                 # languages=["kor"]  # 한국어만 (주석처리)
@@ -280,9 +291,9 @@ class DocumentProcessingService:
             
             elements = partition_pdf(
                 filename=file_path,
-                strategy="ocr_only",  # OCR만 사용
-                infer_table_structure=False,  # 테이블 처리 비활성화
-                include_page_breaks=False,    # 페이지 구분 비활성화
+                strategy="hi_res",  # 고해상도 전략으로 변경
+                infer_table_structure=True,  # 테이블 구조 인식 활성화
+                include_page_breaks=True,    # 페이지 구분 활성화
                 extract_images_in_pdf=False,  # 이미지 추출 비활성화
                 languages=["eng"],  # 영어 (한국어 OCR 문제 해결을 위해 변경)
                 # languages=["kor"],  # 한국어만 (주석처리)

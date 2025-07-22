@@ -22,62 +22,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post(
-    "/upload-vision",
-    summary="Gemini Vision을 통한 문서 분석",
-    description="PDF 파일을 Gemini Vision API로 분석하여 중대성 이슈를 추출합니다.",
-    responses={
-        200: {"description": "문서 처리 성공"},
-        400: {"description": "잘못된 파일 형식"},
-        422: {"description": "파일 처리 실패"},
-        500: {"description": "서버 내부 오류"}
-    }
-)
-async def upload_document_vision(
-    file: UploadFile = File(..., description="업로드할 PDF 파일"),
-    service: DocumentProcessingService = Depends(get_document_processing_service)
-):
-    """
-    Gemini Vision API 기반 ESG 중대성 이슈 추출
-    
-    **특징:**
-    - PDF → 이미지 변환 후 Vision API 분석
-    - 중대성 매트릭스 직접 해석
-    - 테이블과 이미지 동시 분석
-    - 높은 정확도와 빠른 처리
-    """
-    logger.info(f"🔍 Gemini Vision 문서 업로드 요청: {file.filename}")
-    
-    file_id = str(uuid.uuid4())
-    temp_file_path = f"temp_uploads/{file_id}.pdf"
-    
-    try:
-        # 파일 저장
-        logger.info(f"🔍 파일 저장 시작: {temp_file_path}")
-        with open(temp_file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
-        
-        logger.info(f"🔍 파일 저장 완료 - 크기: {len(content)} bytes")
-        
-        # Gemini Vision 처리 호출
-        logger.info(f"🔍 Gemini Vision 문서 처리 시작")
-        result = await service.process_document_with_vision(temp_file_path)
-        
-        logger.info(f"🔍 Gemini Vision 처리 완료: {file.filename}")
-        return JSONResponse(content=result)
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"❌ 오류 발생: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # 임시 파일 삭제
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-            logger.info(f"🔍 임시 파일 삭제 완료: {temp_file_path}")
-
-@router.post(
     "/upload-fast",
     summary="빠른 문서 업로드 및 중대성 이슈 추출",
     description="PDF 파일을 빠르게 처리하여 ESG 중대성 이슈를 추출합니다 (최적화 버전).",
@@ -131,6 +75,75 @@ async def upload_document_fast(
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
             logger.info(f"🔵 임시 파일 삭제 완료: {temp_file_path}")
+
+@router.post(
+    "/upload-vision",
+    response_model=DocumentProcessingResponse,
+    summary="Gemini Vision API 기반 문서 처리",
+    description="PDF 파일을 Gemini Vision API로 처리하여 표/매트릭스 구조의 중대성 이슈를 추출합니다.",
+    responses={
+        200: {
+            "description": "Vision API 처리 성공",
+            "model": DocumentProcessingResponse
+        },
+        400: {
+            "description": "잘못된 파일 형식",
+            "model": ErrorResponse
+        },
+        413: {
+            "description": "파일 크기 초과",
+            "model": ErrorResponse
+        },
+        500: {
+            "description": "서버 오류",
+            "model": ErrorResponse
+        }
+    },
+    operation_id="upload_document_vision"
+)
+async def upload_document_vision(
+    file: UploadFile = File(..., description="업로드할 PDF 파일"),
+    service: DocumentProcessingService = Depends(get_document_processing_service)
+):
+    """
+    🔍 Gemini Vision API 기반 문서 처리
+    
+    특징:
+    - 표, 매트릭스, 차트 구조 인식 가능
+    - 이미지 기반 PDF 처리 최적화
+    - 높은 정확도의 중대성 이슈 추출
+    """
+    logger.info(f"🔍 Vision API 문서 업로드 요청: {file.filename}")
+    
+    file_id = str(uuid.uuid4())
+    temp_file_path = f"temp_uploads/{file_id}.pdf"
+    
+    try:
+        # 파일 저장
+        logger.info(f"🔍 파일 저장 시작: {temp_file_path}")
+        with open(temp_file_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        logger.info(f"🔍 파일 저장 완료 - 크기: {len(content)} bytes")
+        
+        # Vision API 처리 호출
+        logger.info(f"🔍 Gemini Vision API 문서 처리 시작")
+        result = await service.process_document_with_vision(temp_file_path)
+        
+        logger.info(f"🔍 Vision API 처리 완료: {file.filename}")
+        return JSONResponse(content=result)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Vision API 오류 발생: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # 임시 파일 삭제
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+            logger.info(f"🔍 임시 파일 삭제 완료: {temp_file_path}")
 
 @router.post(
     "/upload",

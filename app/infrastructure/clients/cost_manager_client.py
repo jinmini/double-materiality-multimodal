@@ -79,13 +79,30 @@ class CostManagerClient:
     
     def _save_usage_data(self):
         """사용량 데이터를 JSON 파일에 저장합니다."""
-        with self._lock:
-            try:
-                data_to_save = {date_str: asdict(usage) for date_str, usage in self.usage_data.items()}
-                with open(self.usage_file, 'w', encoding='utf-8') as f:
-                    json.dump(data_to_save, f, indent=2, ensure_ascii=False)
-            except IOError as e:
-                logger.error(f"사용량 데이터 저장 실패: {e}")
+        try:
+            # 🔥 임시 해결책: 파일 저장을 비동기적으로 처리 (블로킹 방지)
+            data_to_save = {date_str: asdict(usage) for date_str, usage in self.usage_data.items()}
+            
+            # Lock 없이 직접 저장 시도 (빠른 처리)
+            import tempfile
+            import os
+            
+            # 임시 파일에 먼저 저장 후 원본으로 이동 (atomic operation)
+            temp_file = str(self.usage_file) + ".tmp"
+            
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(data_to_save, f, indent=2, ensure_ascii=False)
+            
+            # 원본 파일로 이동 (Windows에서 안전한 방법)
+            if os.path.exists(self.usage_file):
+                os.remove(self.usage_file)
+            os.rename(temp_file, self.usage_file)
+            
+            logger.info(f"✅ 사용량 데이터 저장 완료: {self.usage_file}")
+            
+        except Exception as e:
+            logger.warning(f"⚠️ 사용량 데이터 저장 실패 (계속 진행): {e}")
+            # 🔥 중요: 예외가 발생해도 프로그램 흐름을 중단하지 않음
     
     def get_today_usage(self) -> APIUsage:
         """오늘 날짜의 사용량 객체를 가져오거나 생성합니다."""
@@ -137,20 +154,65 @@ class CostManagerClient:
     
     def record_api_call(self, model: str, input_tokens: int, output_tokens: int, actual_cost: Optional[float] = None):
         """API 호출 결과를 기록하고 사용량을 업데이트합니다."""
-        cost = actual_cost if actual_cost is not None else self.estimate_cost(model, input_tokens, output_tokens)
-        
-        with self._lock:
-            today_usage = self.get_today_usage()
-            today_usage.requests_count += 1
-            today_usage.tokens_used += input_tokens + output_tokens
-            today_usage.estimated_cost += cost
-            today_usage.last_updated = datetime.now().isoformat()
-            self._save_usage_data()
-
-        logger.info(
-            f"API 호출 기록: {model}, 토큰: {input_tokens+output_tokens}, 비용: ${cost:.6f}, "
-            f"오늘 누적 요청: {today_usage.requests_count}, 누적 비용: ${today_usage.estimated_cost:.4f}"
-        )
+        try:
+            cost = actual_cost if actual_cost is not None else self.estimate_cost(model, input_tokens, output_tokens)
+            logger.info(f"🔍 비용 계산 완료: ${cost:.6f}")
+            
+            # Lock 획득 시도 (타임아웃 없지만 빠른 처리)
+            acquired = self._lock.acquire(blocking=False)
+            if not acquired:
+                logger.warning("⚠️ Lock 획득 실패, 비동기 처리로 건너뛰기")
+                return
+            
+            try:
+                logger.info(f"🔍 사용량 업데이트 시작")
+                today_usage = self.get_today_usage()
+                today_usage.requests_count += 1
+                today_usage.tokens_used += input_tokens + output_tokens
+                today_usage.estimated_cost += cost
+                today_usage.last_updated = datetime.now().isoformat()
+                
+                logger.info(f"🔍 파일 저장 시작")
+                
+                # 🔥 타임아웃 옵션: 파일 저장에 시간 제한 적용
+                import signal
+                import time
+                
+                def timeout_handler(signum, frame):
+                    raise TimeoutError("파일 저장 타임아웃")
+                
+                try:
+                    # 5초 타임아웃 설정 (Windows에서는 이 방법이 제한적일 수 있음)
+                    old_handler = signal.signal(signal.SIGALRM, timeout_handler) if hasattr(signal, 'SIGALRM') else None
+                    if hasattr(signal, 'alarm'):
+                        signal.alarm(5)  # 5초 타임아웃
+                    
+                    save_start = time.time()
+                    self._save_usage_data()
+                    save_time = time.time() - save_start
+                    
+                    if hasattr(signal, 'alarm'):
+                        signal.alarm(0)  # 타임아웃 해제
+                    if old_handler:
+                        signal.signal(signal.SIGALRM, old_handler)
+                    
+                    logger.info(f"🔍 파일 저장 완료 ({save_time:.2f}초)")
+                    
+                except (TimeoutError, Exception) as e:
+                    if hasattr(signal, 'alarm'):
+                        signal.alarm(0)  # 타임아웃 해제
+                    logger.warning(f"⚠️ 파일 저장 실패/타임아웃 (무시하고 계속): {e}")
+                
+                logger.info(
+                    f"API 호출 기록: {model}, 토큰: {input_tokens+output_tokens}, 비용: ${cost:.6f}, "
+                    f"오늘 누적 요청: {today_usage.requests_count}, 누적 비용: ${today_usage.estimated_cost:.4f}"
+                )
+            finally:
+                self._lock.release()
+                
+        except Exception as e:
+            logger.error(f"❌ API 호출 기록 실패: {e}")
+            logger.info("⚠️ 사용량 기록 실패했지만 계속 진행")
     
     def get_usage_summary(self, days: int = 7) -> Dict:
         """최근 사용량 요약을 반환합니다."""

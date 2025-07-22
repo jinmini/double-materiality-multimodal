@@ -6,6 +6,26 @@ ESG 이슈 풀 추출기 서버 실행 스크립트
 import uvicorn
 import sys
 from pathlib import Path
+from fastapi import FastAPI # <<--- FastAPI 임포트 추가
+
+# 🚀 FastAPI 앱 객체를 main() 함수 바깥, 즉 파일의 최상위 레벨에 정의합니다.
+app = FastAPI(
+    title="ESG 이슈 풀 추출기",
+    description="ESG 관련 이슈를 문서에서 추출하는 서비스",
+    version="1.0.0",
+)
+
+# TODO: 여기에 실제 FastAPI 라우트(경로) 및 비즈니스 로직을 추가합니다.
+# 예시:
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "Server is running"}
+
+# @app.post("/extract_esg_issues")
+# async def extract_issues(payload: SomeInputModel):
+#     # ... 이슈 추출 로직 ...
+#     return {"issues": [...]}
+
 
 def main():
     """서버 시작"""
@@ -22,7 +42,8 @@ def main():
     
     try:
         uvicorn.run(
-            "app.main:app",  # ✅ 변경: main:app → app.main:app
+            "__main__:app",  # ✅ 변경: 'run_server:app' → '__main__:app'
+                             # 현재 스크립트가 메인 모듈이므로 '__main__'을 사용
             host="0.0.0.0",
             port=8000,
             reload=True,
@@ -35,4 +56,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main() 
+    main()

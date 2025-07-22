@@ -20,7 +20,14 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # 시작 시 실행
     logger.info(f"Starting up {settings.APP_NAME}...")
-    # config.py에서 제거했던 디렉토리 생성 로직을 이곳으로 이동
+    
+    # 🔧 API 키 디버깅
+    if settings.GEMINI_API_KEY:
+        logger.info(f"✅ Gemini API 키 로드됨: {settings.GEMINI_API_KEY[:20]}...")
+    else:
+        logger.error("❌ Gemini API 키가 없습니다!")
+        logger.info("💡 .env 파일 확인: GEMINI_API_KEY=...")
+    
     settings.UPLOAD_DIR.mkdir(exist_ok=True)
     settings.OUTPUT_DIR.mkdir(exist_ok=True)
     logger.info("Temporary directories are ready.")

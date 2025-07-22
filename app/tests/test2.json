@@ -1,0 +1,325 @@
+{
+    "file_info": {
+      "filename": "c0a2cece-795d-474a-b74d-5d9a80e3ba80.pdf",
+      "file_id": "c0a2cece-795d-474a-b74d-5d9a80e3ba80",
+      "processed_at": "2025-07-22T17:27:58.714872",
+      "processing_time": "8.52초"
+    },
+    "document_analysis": {
+      "total_pages": 5,
+      "analyzed_pages": 5,
+      "page_limit_applied": false,
+      "has_images": true,
+      "has_text": false
+    },
+    "materiality_issues": [
+      {
+        "issue_name": "기후변화 대응",
+        "esg_category": "E",
+        "priority": "높음",
+        "description": "핵심 중요주제",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "산업안전보건 관리",
+        "esg_category": "S",
+        "priority": "높음",
+        "description": "핵심 중요주제",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "윤리경영·공정거래",
+        "esg_category": "G",
+        "priority": "높음",
+        "description": "핵심 중요주제",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "이사회 중심의 ESG 관리 체계 구축",
+        "esg_category": "G",
+        "priority": "보통",
+        "description": "신규 주제",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "공급망 ESG 리스크 관리",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "다양성 및 포용성 강화",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "신규 주제",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "저탄소 경제구조 전환에 따른 사업 및 투자 확대",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "생물다양성 보호 및 해양 자원 관리",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "협력사 동반성장 및 상생",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "폐기물 감축 및 순환경제 실현",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "인재확보 및 구성원 성장 지원",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "수자원 사용 절감 및 폐수 관리",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "환경경영 전략 및 체계",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "설명 없음",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      }
+    ],
+    "esg_content_summary": {
+      "환경(E)": 6,
+      "사회(S)": 5,
+      "지배구조(G)": 2,
+      "기타": 0
+    },
+    "esg_categorized": {
+      "환경(E)": [
+        {
+          "issue_name": "기후변화 대응",
+          "esg_category": "E",
+          "priority": "높음",
+          "description": "핵심 중요주제",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "저탄소 경제구조 전환에 따른 사업 및 투자 확대",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "생물다양성 보호 및 해양 자원 관리",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "폐기물 감축 및 순환경제 실현",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "수자원 사용 절감 및 폐수 관리",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "환경경영 전략 및 체계",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "사회(S)": [
+        {
+          "issue_name": "산업안전보건 관리",
+          "esg_category": "S",
+          "priority": "높음",
+          "description": "핵심 중요주제",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "공급망 ESG 리스크 관리",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "다양성 및 포용성 강화",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "신규 주제",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "협력사 동반성장 및 상생",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "인재확보 및 구성원 성장 지원",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "설명 없음",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "지배구조(G)": [
+        {
+          "issue_name": "윤리경영·공정거래",
+          "esg_category": "G",
+          "priority": "높음",
+          "description": "핵심 중요주제",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "이사회 중심의 ESG 관리 체계 구축",
+          "esg_category": "G",
+          "priority": "보통",
+          "description": "신규 주제",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "기타": []
+    },
+    "extraction_method": "gemini_vision_optimized",
+    "extraction_confidence": {
+      "score": 0.9,
+      "level": "high",
+      "issues_found": 13,
+      "has_tables": true
+    }
+  }

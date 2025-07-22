@@ -1,0 +1,347 @@
+{
+    "file_info": {
+      "filename": "4ee4cc91-9dd3-4628-b14d-c8e3dab63543.pdf",
+      "file_id": "4ee4cc91-9dd3-4628-b14d-c8e3dab63543",
+      "processed_at": "2025-07-22T14:22:33.785357",
+      "processing_time": "6.65초"
+    },
+    "document_analysis": {
+      "total_pages": 1,
+      "analyzed_pages": 1,
+      "page_limit_applied": false,
+      "has_images": true,
+      "has_text": false
+    },
+    "materiality_issues": [
+      {
+        "issue_name": "기후변화 대응 및 온실가스 감축",
+        "esg_category": "E",
+        "priority": "높음",
+        "description": "기후변화 대응 및 온실가스 감축",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "신재생에너지 사업 확대",
+        "esg_category": "E",
+        "priority": "높음",
+        "description": "신재생에너지 사업 확대",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "안전보건",
+        "esg_category": "S",
+        "priority": "높음",
+        "description": "안전보건",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "윤리경영",
+        "esg_category": "G",
+        "priority": "높음",
+        "description": "윤리경영",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "용수 및 폐기물 관리",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "용수 및 폐기물 관리",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "인권경영",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "인권경영",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "친환경투자 강화",
+        "esg_category": "G",
+        "priority": "보통",
+        "description": "친환경투자 강화",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "안정적 전력 공급을 통한 고객만족 제고",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "안정적 전력 공급을 통한 고객만족 제고",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "건전한 지배구조 확립",
+        "esg_category": "G",
+        "priority": "보통",
+        "description": "건전한 지배구조 확립",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "정보보안 및 개인정보보호",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "정보보안 및 개인정보보호",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "지역경제 활성화",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "지역경제 활성화",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "생물다양성 보전",
+        "esg_category": "E",
+        "priority": "보통",
+        "description": "생물다양성 보전",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "공급망 ESG 관리",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "공급망 ESG 관리",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      },
+      {
+        "issue_name": "다양성 및 포용성 증진",
+        "esg_category": "S",
+        "priority": "보통",
+        "description": "다양성 및 포용성 증진",
+        "source_page": 1,
+        "stakeholder_interest": "보통",
+        "business_impact": "보통",
+        "confidence": "높음",
+        "confidence_score": 0.9
+      }
+    ],
+    "esg_content_summary": {
+      "환경(E)": 4,
+      "사회(S)": 7,
+      "지배구조(G)": 3,
+      "기타": 0
+    },
+    "esg_categorized": {
+      "환경(E)": [
+        {
+          "issue_name": "기후변화 대응 및 온실가스 감축",
+          "esg_category": "E",
+          "priority": "높음",
+          "description": "기후변화 대응 및 온실가스 감축",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "신재생에너지 사업 확대",
+          "esg_category": "E",
+          "priority": "높음",
+          "description": "신재생에너지 사업 확대",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "용수 및 폐기물 관리",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "용수 및 폐기물 관리",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "생물다양성 보전",
+          "esg_category": "E",
+          "priority": "보통",
+          "description": "생물다양성 보전",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "사회(S)": [
+        {
+          "issue_name": "안전보건",
+          "esg_category": "S",
+          "priority": "높음",
+          "description": "안전보건",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "인권경영",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "인권경영",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "안정적 전력 공급을 통한 고객만족 제고",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "안정적 전력 공급을 통한 고객만족 제고",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "정보보안 및 개인정보보호",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "정보보안 및 개인정보보호",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "지역경제 활성화",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "지역경제 활성화",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "공급망 ESG 관리",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "공급망 ESG 관리",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "다양성 및 포용성 증진",
+          "esg_category": "S",
+          "priority": "보통",
+          "description": "다양성 및 포용성 증진",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "지배구조(G)": [
+        {
+          "issue_name": "윤리경영",
+          "esg_category": "G",
+          "priority": "높음",
+          "description": "윤리경영",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "친환경투자 강화",
+          "esg_category": "G",
+          "priority": "보통",
+          "description": "친환경투자 강화",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        },
+        {
+          "issue_name": "건전한 지배구조 확립",
+          "esg_category": "G",
+          "priority": "보통",
+          "description": "건전한 지배구조 확립",
+          "source_page": 1,
+          "stakeholder_interest": "보통",
+          "business_impact": "보통",
+          "confidence": "높음",
+          "confidence_score": 0.9
+        }
+      ],
+      "기타": []
+    },
+    "extraction_method": "gemini_vision_optimized",
+    "extraction_confidence": {
+      "score": 0.9,
+      "level": "high",
+      "issues_found": 14,
+      "has_tables": true
+    }
+  }

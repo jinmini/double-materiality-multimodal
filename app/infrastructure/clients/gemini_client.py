@@ -245,10 +245,10 @@ class GeminiClient:
             import base64
             image_data = base64.b64decode(image_base64)
             
-            # Gemini Vision 모델 초기화 (60초 타임아웃 설정)
+            # Gemini Vision 모델 초기화
             model_instance = genai.GenerativeModel(model_name)
             
-            # 생성 설정 (타임아웃 포함)
+            # 생성 설정
             generation_config = genai.types.GenerationConfig(
                 max_output_tokens=max_tokens,
                 temperature=0.1,
@@ -261,23 +261,41 @@ class GeminiClient:
                 "data": image_data
             }
             
-            # gRPC 타임아웃 환경변수 설정 (60초)
+            # gRPC 타임아웃 환경변수 설정 (30초로 단축)
             import os
             old_timeout = os.environ.get('GRPC_PYTHON_DEFAULT_TIMEOUT_SECONDS')
-            os.environ['GRPC_PYTHON_DEFAULT_TIMEOUT_SECONDS'] = '60'
+            os.environ['GRPC_PYTHON_DEFAULT_TIMEOUT_SECONDS'] = '15'  # 15초로 더 단축
             
             try:
-                response = model_instance.generate_content(
-                    [prompt, image_part],
-                    generation_config=generation_config
-                )
+                # 🔥 강력한 타임아웃 추가: asyncio.wait_for 사용
+                async def make_request():
+                    # 동기 함수를 비동기로 실행
+                    loop = asyncio.get_event_loop()
+                    return await loop.run_in_executor(
+                        None,
+                        lambda: model_instance.generate_content(
+                            [prompt, image_part],
+                            generation_config=generation_config
+                        )
+                    )
+                
+                # 20초 타임아웃으로 Vision API 호출 (30초에서 단축)
+                response = await asyncio.wait_for(make_request(), timeout=20.0)
+                
+            except asyncio.TimeoutError:
+                logger.error("❌ Gemini Vision API 20초 타임아웃 발생")
+                raise Exception("Gemini Vision API 응답 시간이 20초를 초과했습니다. 이미지가 너무 크거나 복잡할 수 있습니다.")
             except Exception as e:
                 error_msg = str(e).lower()
                 if "deadline" in error_msg or "timeout" in error_msg or "429" in error_msg:
                     logger.error("❌ Gemini Vision API 타임아웃 또는 요청 한도 초과")
-                    raise Exception("Gemini Vision API 응답 시간이 60초를 초과했거나 요청 한도가 초과되었습니다.")
+                    raise Exception("Gemini Vision API 응답 시간이 초과했거나 요청 한도가 초과되었습니다.")
+                elif "quota" in error_msg or "limit" in error_msg:
+                    logger.error("❌ Gemini Vision API 할당량 초과") 
+                    raise Exception("Gemini Vision API 할당량이 초과되었습니다. 잠시 후 다시 시도해주세요.")
                 else:
-                    raise e
+                    logger.error(f"❌ Gemini Vision API 호출 실패: {str(e)}")
+                    raise Exception(f"Gemini Vision API 호출 중 오류가 발생했습니다: {str(e)}")
             finally:
                 # 환경변수 복구
                 if old_timeout is not None:
@@ -286,25 +304,42 @@ class GeminiClient:
                     os.environ.pop('GRPC_PYTHON_DEFAULT_TIMEOUT_SECONDS', None)
             
             response_time = time.time() - start_time
+            logger.info(f"✅ Gemini Vision 분석 완료: {response_time:.2f}초")
             
             if not response.candidates or not response.text:
                 raise Exception("Gemini Vision API에서 응답을 생성하지 못했습니다.")
             
             content = response.text.strip()
+            logger.info(f"🔍 Gemini Vision 응답 길이: {len(content)} 문자")
+            logger.debug(f"🔍 응답 시작 부분: {content[:200]}...")
             
-            # 토큰 사용량 추정
-            input_tokens = self.estimate_tokens(prompt) + 1000  # 이미지 토큰 추정
-            output_tokens = self.estimate_tokens(content)
+            # 토큰 사용량 추정 (try-catch로 보호)
+            try:
+                input_tokens = self.estimate_tokens(prompt) + 1000  # 이미지 토큰 추정
+                output_tokens = self.estimate_tokens(content)
+                logger.info(f"🔍 토큰 추정 완료: 입력={input_tokens}, 출력={output_tokens}")
+            except Exception as e:
+                logger.warning(f"⚠️ 토큰 추정 실패: {e}, 기본값 사용")
+                input_tokens = 1000
+                output_tokens = min(1000, len(content) // 4)  # 안전한 기본값
             
             # 실제 사용량 정보가 있다면 사용
-            if hasattr(response, 'usage_metadata') and response.usage_metadata:
-                if hasattr(response.usage_metadata, 'prompt_token_count'):
-                    input_tokens = response.usage_metadata.prompt_token_count
-                if hasattr(response.usage_metadata, 'candidates_token_count'):
-                    output_tokens = response.usage_metadata.candidates_token_count
+            try:
+                if hasattr(response, 'usage_metadata') and response.usage_metadata:
+                    if hasattr(response.usage_metadata, 'prompt_token_count'):
+                        input_tokens = response.usage_metadata.prompt_token_count
+                    if hasattr(response.usage_metadata, 'candidates_token_count'):
+                        output_tokens = response.usage_metadata.candidates_token_count
+                    logger.info(f"🔍 실제 토큰 사용량: 입력={input_tokens}, 출력={output_tokens}")
+            except Exception as e:
+                logger.warning(f"⚠️ usage_metadata 접근 실패: {e}")
             
-            # 비용 기록
-            self.cost_manager.record_api_call(model_name, input_tokens, output_tokens)
+            # 비용 기록 (try-catch로 보호)
+            try:
+                self.cost_manager.record_api_call(model_name, input_tokens, output_tokens)
+                logger.info(f"🔍 비용 기록 완료")
+            except Exception as e:
+                logger.warning(f"⚠️ 비용 기록 실패: {e}, 계속 진행")
             
             logger.info(f"✅ Gemini Vision 분석 완료: {response_time:.2f}초, 토큰: {input_tokens}/{output_tokens}")
             
