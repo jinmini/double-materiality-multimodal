@@ -20,13 +20,7 @@ from app.domain.logic import (
     calculate_overall_confidence
 )
 
-# 다른 의존성들 (원래 main.py에서 import하던 것들)
-# TODO: 이 부분들도 나중에 리팩토링 대상
-try:
-    from app.process_esg import ESGDocumentProcessor
-except ImportError:
-    # process_esg가 아직 리팩토링되지 않은 경우 임시 처리
-    ESGDocumentProcessor = None
+# ESGDocumentProcessor 제거 완료 - process_esg.py 삭제됨
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +32,6 @@ class DocumentProcessingService:
                  gemini_client: GeminiClient):
         self.cost_manager = cost_manager
         self.gemini_client = gemini_client
-        
-        # ESG 문서 처리기 초기화 (나중에 이것도 의존성 주입으로 변경 예정)
-        if ESGDocumentProcessor:
-            self.processor = ESGDocumentProcessor(output_dir=str(settings.OUTPUT_DIR))
-        else:
-            self.processor = None
-            logger.warning("ESGDocumentProcessor를 로드할 수 없습니다.")
     
     def validate_file(self, file: UploadFile) -> None:
         """업로드된 파일 검증"""
@@ -73,6 +60,56 @@ class DocumentProcessingService:
             raise HTTPException(status_code=429, detail=message)
         
         logger.info("API 사용량 확인 통과")
+    
+    async def save_uploaded_file_and_process_with_vision(self, file: UploadFile) -> Dict[str, Any]:
+        """
+        Vision API용 파일 저장 및 처리 헬퍼 메서드
+        """
+        logger.info(f"🔍 Vision API 파일 업로드 시작: {file.filename}")
+        
+        # 1. 사전 검증
+        self.validate_file(file)
+        self.check_usage_limit()
+        
+        # 2. 임시 파일 저장
+        file_id = str(uuid.uuid4())
+        file_extension = file.filename.split('.')[-1].lower()
+        temp_filename = f"{file_id}.{file_extension}"
+        temp_path = Path(settings.UPLOAD_DIR) / temp_filename
+        
+        try:
+            # 파일 저장
+            with open(temp_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            
+            logger.info(f"🔍 파일 저장 완료: {temp_path}")
+            
+            # 3. Vision API로 문서 처리
+            if file_extension == "pdf":
+                result = await self.process_document_with_vision(str(temp_path))
+                # 파일 정보 업데이트
+                result["file_info"]["filename"] = file.filename
+                result["file_info"]["file_id"] = file_id
+                return result
+            else:
+                raise HTTPException(
+                    status_code=501,
+                    detail="Vision API는 현재 PDF 파일만 지원합니다."
+                )
+                
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Vision API 처리 중 오류 발생: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Vision API 파일 처리 중 오류가 발생했습니다: {str(e)}"
+            )
+        finally:
+            # 임시 파일 정리
+            if temp_path.exists():
+                temp_path.unlink()
+                logger.info(f"🔍 임시 파일 삭제: {temp_path}")
     
     async def process_uploaded_file(self, file: UploadFile) -> Dict[str, Any]:
         """
@@ -105,7 +142,11 @@ class DocumentProcessingService:
             
             # 3. 문서 처리
             if file_extension == "pdf":
-                return await self._process_pdf(temp_path, file.filename, file_id)
+                result = await self.process_document(str(temp_path))
+                # 파일 정보 업데이트
+                result["file_info"]["filename"] = file.filename
+                result["file_info"]["file_id"] = file_id
+                return result
             else:
                 # 이미지 처리는 추후 구현
                 raise HTTPException(
@@ -355,96 +396,7 @@ class DocumentProcessingService:
         
         return extracted_content
     
-    async def _process_pdf(self, temp_path: Path, filename: str, file_id: str) -> Dict[str, Any]:
-        """PDF 파일 처리 로직 (하이브리드 접근법)"""
-        if not self.processor:
-            raise HTTPException(
-                status_code=500,
-                detail="문서 처리기가 초기화되지 않았습니다."
-            )
-        
-        # 1차: 일반 고해상도 처리
-        logger.info("1차: 고해상도 PDF 처리 시작")
-        elements = self.processor.process_pdf(str(temp_path), use_ocr=False)
-        
-        # 텍스트 추출 실패 시 OCR 시도
-        if not elements or len(elements) == 0:
-            logger.info("2차: OCR을 사용한 PDF 처리 시작")
-            elements = self.processor.process_pdf(str(temp_path), use_ocr=True)
-        
-        # OCR도 실패한 경우 Gemini Vision API 시도 (향후 구현)
-        if not elements or len(elements) == 0:
-            logger.warning("Unstructured 처리 실패, Gemini Vision API 사용 필요")
-            # TODO: Gemini Vision API 구현
-            raise HTTPException(
-                status_code=422,
-                detail="PDF에서 내용을 추출할 수 없습니다. 파일이 손상되었거나 텍스트가 없을 수 있습니다. Gemini Vision API를 시도해보세요."
-            )
-        
-        # 문서 구조 분석
-        structure = self.processor.analyze_document_structure(elements)
-        
-        # ESG 내용 추출
-        esg_content = self.processor.extract_esg_keywords(elements)
-        
-        # 1차: Unstructured 기반 중대성 이슈 추출 (도메인 로직 사용)
-        unstructured_analysis = extract_materiality_issues_enhanced(elements)
-        unstructured_issues = unstructured_analysis.get("issues", [])
-        
-        # 2차: Gemini AI 기반 텍스트 분석 (임시 비활성화)
-        gemini_result = {"success": False}
-        extraction_method = "unstructured_only"
-        
-        # 임시로 Gemini API 비활성화 (블로킹 이슈 해결)
-        if False and self.gemini_client.is_available() and len(unstructured_issues) < 5:
-            # unstructured 결과가 부족한 경우에만 Gemini 활용
-            full_text = "\n".join([el.text for el in elements if hasattr(el, 'text')])
-            logger.info("Gemini API를 사용한 추가 분석 시작")
-            
-            success, gemini_result = await self.gemini_client.extract_issues_from_text(
-                full_text[:5000], 
-                settings.GEMINI_MODEL, 
-                settings.GEMINI_MAX_TOKENS
-            )
-            
-            if not success:
-                logger.warning(f"Gemini 분석 실패: {gemini_result.get('error', '알 수 없는 오류')}")
-        
-        # 결과 병합
-        if gemini_result.get("success"):
-            final_issues = self.gemini_client.merge_extraction_results(unstructured_issues, gemini_result)
-            extraction_method = "hybrid"
-        else:
-            final_issues = unstructured_issues
-        
-        # 처리 완료 후 사용량 기록 (unstructured 처리는 무료)
-        self.cost_manager.record_api_call("unstructured", 0, 0, 0.0)
-        
-        # 결과 구성
-        result = {
-            "file_info": {
-                "filename": filename,
-                "file_id": file_id,
-                "processed_at": datetime.now().isoformat()
-            },
-            "document_analysis": {
-                "total_elements": structure["total_elements"],
-                "page_count": structure["page_count"],
-                "titles_found": len(structure["titles"]),
-                "tables_found": len(structure["tables"])
-            },
-            "materiality_issues": final_issues,
-            "esg_content_summary": {
-                category: len(contents) 
-                for category, contents in esg_content.items()
-            },
-            "extraction_method": extraction_method,
-            "extraction_confidence": calculate_overall_confidence(final_issues, structure),
-            "gemini_metadata": gemini_result.get("metadata") if gemini_result.get("success") else None
-        }
-        
-        logger.info(f"처리 완료: {len(final_issues)}개 이슈 추출 ({extraction_method})")
-        return result
+
     
     def get_usage_summary(self) -> Dict[str, Any]:
         """현재 사용량 및 비용 확인"""

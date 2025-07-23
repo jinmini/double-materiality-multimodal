@@ -1,11 +1,7 @@
 # app/api/v1/endpoints/documents.py
 
 import logging
-import os
-import uuid
-from pathlib import Path
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
@@ -23,19 +19,32 @@ router = APIRouter()
 
 @router.post(
     "/upload-fast",
+    response_model=DocumentProcessingResponse,
     summary="빠른 문서 업로드 및 중대성 이슈 추출",
     description="PDF 파일을 빠르게 처리하여 ESG 중대성 이슈를 추출합니다 (최적화 버전).",
     responses={
-        200: {"description": "문서 처리 성공"},
-        400: {"description": "잘못된 파일 형식"},
-        422: {"description": "파일 처리 실패"},
-        500: {"description": "서버 내부 오류"}
+        200: {
+            "description": "문서 처리 성공",
+            "model": DocumentProcessingResponse
+        },
+        400: {
+            "description": "잘못된 파일 형식",
+            "model": ErrorResponse
+        },
+        422: {
+            "description": "파일 처리 실패",
+            "model": ErrorResponse
+        },
+        500: {
+            "description": "서버 내부 오류",
+            "model": ErrorResponse
+        }
     }
 )
 async def upload_document_fast(
     file: UploadFile = File(..., description="업로드할 PDF 파일"),
     service: DocumentProcessingService = Depends(get_document_processing_service)
-):
+) -> DocumentProcessingResponse:
     """
     최적화된 ESG 문서 처리 - 빠른 처리를 위한 경량화 버전
     
@@ -46,35 +55,10 @@ async def upload_document_fast(
     """
     logger.info(f"🔵 빠른 문서 업로드 요청: {file.filename}")
     
-    file_id = str(uuid.uuid4())
-    temp_file_path = f"temp_uploads/{file_id}.pdf"
-    
-    try:
-        # 파일 저장
-        logger.info(f"🔵 파일 저장 시작: {temp_file_path}")
-        with open(temp_file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
-        
-        logger.info(f"🔵 파일 저장 완료 - 크기: {len(content)} bytes")
-        
-        # 최적화된 처리 호출
-        logger.info(f"🔵 최적화된 문서 처리 시작")
-        result = await service.process_document(temp_file_path)
-        
-        logger.info(f"🔵 문서 처리 완료: {file.filename}")
-        return JSONResponse(content=result)
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"❌ 오류 발생: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # 임시 파일 삭제
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-            logger.info(f"🔵 임시 파일 삭제 완료: {temp_file_path}")
+    # DocumentProcessingService로 완전 위임 (파일 저장, 검증, 처리 모두 포함)
+    result = await service.process_uploaded_file(file)
+    logger.info(f"🔵 문서 처리 완료: {file.filename}")
+    return DocumentProcessingResponse(**result)
 
 @router.post(
     "/upload-vision",
@@ -104,7 +88,7 @@ async def upload_document_fast(
 async def upload_document_vision(
     file: UploadFile = File(..., description="업로드할 PDF 파일"),
     service: DocumentProcessingService = Depends(get_document_processing_service)
-):
+) -> DocumentProcessingResponse:
     """
     🔍 Gemini Vision API 기반 문서 처리
     
@@ -115,35 +99,10 @@ async def upload_document_vision(
     """
     logger.info(f"🔍 Vision API 문서 업로드 요청: {file.filename}")
     
-    file_id = str(uuid.uuid4())
-    temp_file_path = f"temp_uploads/{file_id}.pdf"
-    
-    try:
-        # 파일 저장
-        logger.info(f"🔍 파일 저장 시작: {temp_file_path}")
-        with open(temp_file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
-        
-        logger.info(f"🔍 파일 저장 완료 - 크기: {len(content)} bytes")
-        
-        # Vision API 처리 호출
-        logger.info(f"🔍 Gemini Vision API 문서 처리 시작")
-        result = await service.process_document_with_vision(temp_file_path)
-        
-        logger.info(f"🔍 Vision API 처리 완료: {file.filename}")
-        return JSONResponse(content=result)
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"❌ Vision API 오류 발생: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # 임시 파일 삭제
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-            logger.info(f"🔍 임시 파일 삭제 완료: {temp_file_path}")
+    # DocumentProcessingService의 Vision 전용 메서드로 완전 위임
+    result = await service.save_uploaded_file_and_process_with_vision(file)
+    logger.info(f"🔍 Vision API 처리 완료: {file.filename}")
+    return DocumentProcessingResponse(**result)
 
 @router.post(
     "/upload",
@@ -198,20 +157,9 @@ async def upload_document(
     """
     logger.info(f"문서 업로드 요청: {file.filename}")
     
-    try:
-        result = await service.process_uploaded_file(file)
-        logger.info(f"문서 처리 완료: {file.filename}")
-        return DocumentProcessingResponse(**result)
-    
-    except HTTPException:
-        # FastAPI HTTPException은 그대로 전파
-        raise
-    except Exception as e:
-        logger.error(f"예상치 못한 오류: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"서버 내부 오류가 발생했습니다: {str(e)}"
-        )
+    result = await service.process_uploaded_file(file)
+    logger.info(f"문서 처리 완료: {file.filename}")
+    return DocumentProcessingResponse(**result)
 
 @router.post(
     "/reset-usage",
@@ -236,17 +184,9 @@ async def reset_daily_usage(
     """
     logger.info("일일 사용량 리셋 요청")
     
-    try:
-        result = service.reset_daily_usage()
-        logger.info("일일 사용량 리셋 완료")
-        return SuccessResponse(**result)
-    
-    except Exception as e:
-        logger.error(f"사용량 리셋 실패: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"사용량 리셋 중 오류가 발생했습니다: {str(e)}"
-        )
+    result = service.reset_daily_usage()
+    logger.info("일일 사용량 리셋 완료")
+    return SuccessResponse(**result)
 
 class MaterialityIssue(BaseModel):
     issue_id: int

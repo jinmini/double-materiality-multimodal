@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "ESG 이슈 풀 추출기"
     APP_VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
-    DEBUG: bool = True  # 개발 환경을 위해 True로 변경
+    DEBUG: bool = True  # 환경변수 DEBUG=false로 운영모드 전환 가능
     
     # CORS 설정 (프로덕션에서는 특정 도메인을 지정해야 합니다)
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
